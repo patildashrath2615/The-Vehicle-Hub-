@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two Wheeler & Car Shop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1920&h=1080&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .form-section {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filter-buttons button {
+            flex: 1;
+        }
+        .inventory {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .vehicle-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+        .vehicle-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .vehicle-card.bike {
+            border-top: 5px solid #4CAF50;
+        }
+        .vehicle-card.car {
+            border-top: 5px solid #2196F3;
+        }
+        .vehicle-card.accessory {
+            border-top: 5px solid #FF9800;
+        }
+        .vehicle-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+        .vehicle-content {
+            padding: 20px;
+        }
+        .vehicle-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .vehicle-card p {
+            color: #666;
+            margin: 5px 0;
+        }
+        .price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 15px 0;
+            padding: 10px;
+            background: #f0f0ff;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .remove-btn {
+            background: #f44336;
+            padding: 8px 15px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .remove-btn:hover {
+            background: #d32f2f;
+        }
+        .buy-btn {
+            background: #4CAF50;
+            padding: 8px 15px;
+            font-size: 14px;
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+        .buy-btn:hover {
+            background: #45a049;
+        }
+        .billing-section {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            display: none;
+        }
+        .billing-section.active {
+            display: block;
+        }
+        .cart-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cart-item-details {
+            flex: 1;
+        }
+        .cart-total {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            text-align: right;
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+        }
+        .checkout-form {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .remove-cart-btn {
+            background: #f44336;
+            padding: 5px 10px;
+            font-size: 12px;
+            margin: 0;
+        }
+        .print-bill {
+            display: none;
+        }
+        @media print {
+            body {
+                background: white;
+            }
+            body::before {
+                display: none;
+            }
+            .container {
+                box-shadow: none;
+            }
+            .form-section, .filter-buttons, #billingSection, #inventory, button {
+                display: none !important;
+            }
+            .print-bill {
+                display: block !important;
+            }
+        }
+        .bill-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            border: 2px solid #333;
+        }
+        .bill-header {
+            text-align: center;
+            border-bottom: 3px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        .bill-header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+        .bill-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .bill-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .bill-table th, .bill-table td {
+            border: 1px solid #333;
+            padding: 10px;
+            text-align: left;
+        }
+        .bill-table th {
+            background: #f0f0f0;
+            font-weight: bold;
+        }
+        .bill-total {
+            text-align: right;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 3px solid #333;
+        }
+        .bill-footer {
+            margin-top: 40px;
+            text-align: center;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏍️🚗 Shree Swami Samarth Automobiles </h1>
+
+        <div class="filter-buttons">
+            <button onclick="filterInventory('all')">All Items</button>
+            <button onclick="filterInventory('bike')">Two Wheelers</button>
+            <button onclick="filterInventory('car')">Cars</button>
+            <button onclick="filterInventory('accessory')">Accessories</button>
+            <button onclick="toggleBilling()">View Cart & Checkout</button>
+        </div>
+
+        <div id="billingSection" class="billing-section">
+            <h2>Shopping Cart</h2>
+            <div id="cartItems"></div>
+            <div class="cart-total" id="cartTotal">Total: ₹0</div>
+            
+            <div class="checkout-form">
+                <h3>Customer Information</h3>
+                <div class="form-group">
+                    <label>Full Name:</label>
+                    <input type="text" id="customerName" placeholder="John Doe">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="customerEmail" placeholder="john@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone:</label>
+                        <input type="tel" id="customerPhone" placeholder="(555) 123-4567">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Address:</label>
+                    <input type="text" id="customerAddress" placeholder="123 Main St, City, State, ZIP">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Payment Method:</label>
+                        <select id="paymentMethod">
+                            <option value="cash">Cash</option>
+                            <option value="card">Credit/Debit Card</option>
+                            <option value="finance">Financing</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Delivery Date:</label>
+                        <input type="date" id="deliveryDate">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Discount (%):</label>
+                        <input type="number" id="discountPercent" placeholder="Enter discount %" min="0" max="100" value="0" onchange="updateCart()">
+                    </div>
+                    <div class="form-group">
+                        <label>Discount Code (Optional):</label>
+                        <input type="text" id="discountCode" placeholder="Enter code">
+                    </div>
+                </div>
+                <button onclick="completePurchase()">Complete Purchase & Print Bill</button>
+                <button onclick="toggleBilling()" style="background: #999; margin-left: 10px;">Back to Inventory</button>
+            </div>
+        </div>
+
+        <div id="inventory" class="inventory"></div>
+
+        <div class="print-bill" id="printBill">
+            <div class="bill-container">
+                <div class="bill-header">
+                    <h1>🏍️🚗 PATIL MOTOR'S</h1>
+                    <p>Invoice / Bill</p>
+                </div>
+                <div class="bill-info">
+                    <div>
+                        <h3>Customer Information:</h3>
+                        <p id="billCustomerName"></p>
+                        <p id="billCustomerEmail"></p>
+                        <p id="billCustomerPhone"></p>
+                        <p id="billCustomerAddress"></p>
+                    </div>
+                    <div>
+                        <h3>Order Details:</h3>
+                        <p id="billDate"></p>
+                        <p id="billPayment"></p>
+                        <p id="billDelivery"></p>
+                        <p id="billInvoiceNo"></p>
+                    </div>
+                </div>
+                <table class="bill-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Type</th>
+                            <th>Category</th>
+                            <th>Year</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody id="billItems"></tbody>
+                </table>
+                <div class="bill-total" id="billTotal"></div>
+                <div class="bill-footer">
+                    <p>Thank you for your purchase!</p>
+                     <p>Contact:8767509801</p>
+                     <p>Email:patilmotors@gmail.com</p>
+                    <p>For any queries, please contact us at support@twowheelercarshop.com</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let vehicles = [];
+        let cart = [];
+        let nextId = 1;
+        let currentFilter = 'all';
+
+        function toggleFields() {
+            const type = document.getElementById('vehicleType').value;
+            document.getElementById('bikeField').style.display = type === 'bike' ? 'block' : 'none';
+            document.getElementById('carField').style.display = type === 'car' ? 'block' : 'none';
+        }
+
+        function addVehicle() {
+            const type = document.getElementById('vehicleType').value;
+            const brand = document.getElementById('brand').value;
+            const model = document.getElementById('model').value;
+            const price = document.getElementById('price').value;
+            const year = document.getElementById('year').value;
+            const imageUrl = document.getElementById('imageUrl').value;
+
+            if (!brand || !model || !price || !year) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const vehicle = {
+                id: nextId++,
+                type: type,
+                brand: brand,
+                model: model,
+                price: parseFloat(price),
+                year: parseInt(year),
+                imageUrl: imageUrl || getDefaultImage(type),
+                specificType: type === 'bike' ? 
+                    document.getElementById('bikeType').value : 
+                    document.getElementById('fuelType').value
+            };
+
+            vehicles.push(vehicle);
+            clearForm();
+            displayInventory();
+        }
+
+        function getDefaultImage(type) {
+            if (type === 'bike') {
+                return 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=400&h=300&fit=crop';
+            } else {
+                return 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=400&h=300&fit=crop';
+            }
+        }
+
+        function removeVehicle(id) {
+            vehicles = vehicles.filter(v => v.id !== id);
+            displayInventory();
+        }
+
+        function filterInventory(filter) {
+            currentFilter = filter;
+            displayInventory();
+        }
+
+        function displayInventory() {
+            const inventoryDiv = document.getElementById('inventory');
+            let filtered = vehicles;
+
+            if (currentFilter !== 'all') {
+                filtered = vehicles.filter(v => v.type === currentFilter);
+            }
+
+            if (filtered.length === 0) {
+                inventoryDiv.innerHTML = '<p style="text-align:center; color:#999;">No vehicles in inventory</p>';
+                return;
+            }
+
+            let html = '';
+            for (let i = 0; i < filtered.length; i++) {
+                const v = filtered[i];
+                html += '<div class="vehicle-card ' + v.type + '">';
+                html += '<img src="' + v.imageUrl + '" alt="' + v.brand + ' ' + v.model + '" class="vehicle-image">';
+                html += '<div class="vehicle-content">';
+                html += '<h3>' + v.year + ' ' + v.brand + ' ' + v.model + '</h3>';
+                html += '<p><strong>Type:</strong> ' + (v.type === 'bike' ? 'Two Wheeler' : v.type === 'car' ? 'Car' : 'Accessory') + '</p>';
+                html += '<p><strong>' + (v.type === 'accessory' ? 'Category' : v.type === 'bike' ? 'Category' : 'Fuel Type') + ':</strong> ' + v.specificType + '</p>';
+                html += '<p><strong>Year:</strong> ' + v.year + '</p>';
+                html += '<div class="price">₹' + v.price.toLocaleString() + '</div>';
+                html += '<button class="buy-btn" onclick="addToCart(' + v.id + ')">Add to Cart</button>';
+                html += '<button class="remove-btn" onclick="removeVehicle(' + v.id + ')">Remove</button>';
+                html += '</div></div>';
+            }
+            inventoryDiv.innerHTML = html;
+        }
+
+        function clearForm() {
+            document.getElementById('brand').value = '';
+            document.getElementById('model').value = '';
+            document.getElementById('price').value = '';
+            document.getElementById('year').value = '';
+            document.getElementById('imageUrl').value = '';
+        }
+
+        function addToCart(id) {
+            const vehicle = vehicles.find(v => v.id === id);
+            if (vehicle && !cart.find(c => c.id === id)) {
+                cart.push(vehicle);
+                alert(vehicle.brand + ' ' + vehicle.model + ' added to cart!');
+                updateCart();
+            } else if (cart.find(c => c.id === id)) {
+                alert('This vehicle is already in your cart!');
+            }
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(v => v.id !== id);
+            updateCart();
+        }
+
+        function updateCart() {
+            const cartItemsDiv = document.getElementById('cartItems');
+            const cartTotalDiv = document.getElementById('cartTotal');
+
+            if (cart.length === 0) {
+                cartItemsDiv.innerHTML = '<p style="text-align:center; color:#999;">Your cart is empty</p>';
+                cartTotalDiv.innerHTML = 'Total: ₹0';
+                return;
+            }
+
+            const total = cart.reduce((sum, v) => sum + v.price, 0);
+            const discountPercent = parseFloat(document.getElementById('discountPercent').value) || 0;
+            const discount = total * (discountPercent / 100);
+            const subtotal = total - discount;
+            const gst = subtotal * 0.05;
+            const grandTotal = subtotal + gst;
+
+            let html = '';
+            for (let i = 0; i < cart.length; i++) {
+                const v = cart[i];
+                html += '<div class="cart-item">';
+                html += '<div class="cart-item-details">';
+                html += '<strong>' + v.year + ' ' + v.brand + ' ' + v.model + '</strong><br>';
+                html += '<small>' + (v.type === 'bike' ? 'Two Wheeler' : v.type === 'car' ? 'Car' : 'Accessory') + ' - ' + v.specificType + '</small>';
+                html += '</div><div>';
+                html += '<strong style="color: #667eea; font-size: 18px;">₹' + v.price.toLocaleString() + '</strong><br>';
+                html += '<button class="remove-cart-btn" onclick="removeFromCart(' + v.id + ')">Remove</button>';
+                html += '</div></div>';
+            }
+            cartItemsDiv.innerHTML = html;
+            cartTotalDiv.innerHTML = 'Subtotal: ₹' + total.toLocaleString() + 
+                                     (discount > 0 ? '<br>Discount (' + discountPercent + '%): -₹' + discount.toLocaleString() : '') +
+                                     '<br>After Discount: ₹' + subtotal.toLocaleString() +
+                                     '<br>GST (5%): ₹' + gst.toLocaleString() + 
+                                     '<br><strong>Grand Total: ₹' + grandTotal.toLocaleString() + '</strong>';
+        }
+
+        function toggleBilling() {
+            const billingSection = document.getElementById('billingSection');
+            const inventorySection = document.getElementById('inventory');
+            
+            if (billingSection.classList.contains('active')) {
+                billingSection.classList.remove('active');
+                inventorySection.style.display = 'grid';
+            } else {
+                billingSection.classList.add('active');
+                inventorySection.style.display = 'none';
+                updateCart();
+            }
+        }
+
+        function completePurchase() {
+            const name = document.getElementById('customerName').value;
+            const email = document.getElementById('customerEmail').value;
+            const phone = document.getElementById('customerPhone').value;
+            const address = document.getElementById('customerAddress').value;
+            const payment = document.getElementById('paymentMethod').value;
+            const delivery = document.getElementById('deliveryDate').value;
+
+            if (!name || !email || !phone || !address || !delivery) {
+                alert('Please fill in all customer information fields');
+                return;
+            }
+
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+
+            const total = cart.reduce((sum, v) => sum + v.price, 0);
+            const discountPercent = parseFloat(document.getElementById('discountPercent').value) || 0;
+            const discountCode = document.getElementById('discountCode').value;
+            const discount = total * (discountPercent / 100);
+            const subtotal = total - discount;
+            const gst = subtotal * 0.05;
+            const grandTotal = subtotal + gst;
+            const invoiceNo = 'INV-' + Date.now();
+            const currentDate = new Date().toLocaleDateString();
+
+            // Fill bill details
+            document.getElementById('billCustomerName').textContent = 'Name: ' + name;
+            document.getElementById('billCustomerEmail').textContent = 'Email: ' + email;
+            document.getElementById('billCustomerPhone').textContent = 'Phone: ' + phone;
+            document.getElementById('billCustomerAddress').textContent = 'Address: ' + address;
+            document.getElementById('billDate').textContent = 'Date: ' + currentDate;
+            document.getElementById('billPayment').textContent = 'Payment Method: ' + payment;
+            document.getElementById('billDelivery').textContent = 'Delivery Date: ' + delivery;
+            document.getElementById('billInvoiceNo').textContent = 'Invoice No: ' + invoiceNo;
+
+            // Fill bill items
+            let itemsHtml = '';
+            for (let i = 0; i < cart.length; i++) {
+                const v = cart[i];
+                itemsHtml += '<tr>';
+                itemsHtml += '<td>' + v.brand + ' ' + v.model + '</td>';
+                itemsHtml += '<td>' + (v.type === 'bike' ? 'Two Wheeler' : v.type === 'car' ? 'Car' : 'Accessory') + '</td>';
+                itemsHtml += '<td>' + v.specificType + '</td>';
+                itemsHtml += '<td>' + v.year + '</td>';
+                itemsHtml += '<td>₹' + v.price.toLocaleString() + '</td>';
+                itemsHtml += '</tr>';
+            }
+            document.getElementById('billItems').innerHTML = itemsHtml;
+            document.getElementById('billTotal').textContent = 'Subtotal: ₹' + total.toLocaleString() + 
+                                                               (discount > 0 ? ' | Discount (' + discountPercent + '%): -₹' + discount.toLocaleString() : '') +
+                                                               ' | After Discount: ₹' + subtotal.toLocaleString() +
+                                                               ' | GST (5%): ₹' + gst.toLocaleString() + 
+                                                               ' | Grand Total: ₹' + grandTotal.toLocaleString();
+
+            // Print the bill
+            window.print();
+
+            // Clear cart and form after printing
+            setTimeout(function() {
+                cart = [];
+                document.getElementById('customerName').value = '';
+                document.getElementById('customerEmail').value = '';
+                document.getElementById('customerPhone').value = '';
+                document.getElementById('customerAddress').value = '';
+                document.getElementById('deliveryDate').value = '';
+                
+                updateCart();
+                toggleBilling();
+                alert('Purchase completed!\nInvoice No: ' + invoiceNo + 
+                      '\nSubtotal: ₹' + total.toLocaleString() + 
+                      (discount > 0 ? '\nDiscount (' + discountPercent + '%): -₹' + discount.toLocaleString() : '') +
+                      (discountCode ? '\nDiscount Code: ' + discountCode : '') +
+                      '\nAfter Discount: ₹' + subtotal.toLocaleString() +
+                      '\nGST (5%): ₹' + gst.toLocaleString() + 
+                      '\nGrand Total: ₹' + grandTotal.toLocaleString());
+            }, 500);
+        }
+
+        // Add sample data
+        vehicles = [
+            // Indian Bikes - Popular Models Used in India
+            { id: nextId++, type: 'bike', brand: 'Honda', model: 'CB Hornet 2.0', price:230000, year: 2025, specificType: 'sport', imageUrl: 'https://images.91wheels.com/news/wp-content/uploads/2020/08/Honda-Hornet-3-1.jpg?width=640&&q=80' },
+            { id: nextId++, type: 'bike', brand: 'Yamaha', model: 'FZ-S V3', price: 210000, year: 2025, specificType: 'sport', imageUrl: 'https://www.yamaha-motor-india.com/theme/v4/images/webp_images/fz_series_all/fzs-fi-new/color/grey.webp' },
+            { id: nextId++, type: 'bike', brand: 'Bajaj', model: 'Pulsar 220F', price: 130050, year: 2025, specificType: 'sport', imageUrl: 'https://imgd.aeplcdn.com/1280x720/n/cw/ec/142305/pulsar-220-right-side-view-17.png?isig=0' },
+            { id: nextId++, type: 'bike', brand: 'TVS', model: 'Apache RTR 200 4V', price: 140000, year: 2025, specificType: 'sport', imageUrl: 'https://images.timesdrive.in/photo/msid-152970233,thumbsize-337174/152970233.jpg' },
+            { id: nextId++, type: 'bike', brand: 'KTM', model: 'Duke 200', price: 180000, year: 2025, specificType: 'sport', imageUrl: 'https://imgd.aeplcdn.com/1280x720/n/cw/ec/129743/duke-200-right-side-view-5.jpeg?isig=0' },
+            { id: nextId++, type: 'bike', brand: 'Bajaj', model: 'Avenger Street 160', price: 205000, year: 2025, specificType: 'cruiser', imageUrl: 'https://m.media-amazon.com/images/I/51eCFfeV9IL.jpg' },
+            
+
+       
+                
+            // Indian Cars - SUVs (Under ₹18 Lakhs)
+            { id: nextId++, type: 'car', brand: 'Mahindra', model: 'Scorpio Classic', price: 1350000, year: 2024, specificType: 'diesel', imageUrl: 'https://img.autocarindia.com/mmv_images/colors/20250714125759_Mahindra_Scorpio_Classic_Stealth_Black[1].jpg?w=640&q=75' },
+            { id: nextId++, type: 'car', brand: 'Tata', model: 'Harrier', price: 1550000, year: 2024, specificType: 'diesel', imageUrl: 'https://images.autox.com/uploads/2024/01/Tata-Harrier-EV-Concept.jpg' },
+               
+            // Indian Cars - Electric (Under ₹18 Lakhs)
+            { id: nextId++, type: 'car', brand: 'Tata', model: 'Nexon EV', price: 1500000, year: 2024, specificType: 'electric', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzUXMVBKI3fdXudmnDgFyIiQTV54nMKec9vg&s' },
+            { id: nextId++, type: 'car', brand: 'MG', model: 'ZS EV', price: 1700000, year: 2024, specificType: 'electric', imageUrl: 'https://mgmotor.scene7.com/is/image/mgmotor/zs-img-dsc-0318?$mg-rgb-tablet-image-responsive$&fmt=png-alpha' },
+            
+            // Indian Cars - Premium (Under ₹18 Lakhs)
+            { id: nextId++, type: 'car', brand: 'Hyundai', model: 'Alcazar', price: 1650000, year: 2024, specificType: 'diesel', imageUrl: 'https://stimg.cardekho.com/images/carexteriorimages/930x620/Hyundai/Alcazar/9246/1758802404168/front-left-side-47.jpg' },
+            { id: nextId++, type: 'car', brand: 'Volkswagen', model: 'Virtus', price: 1400000, year: 2024, specificType: 'gasoline', imageUrl: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/144681/virtus-exterior-right-front-three-quarter.jpeg' },
+            
+            // Indian Cars - Sedans (Under ₹18 Lakhs)
+            { id: nextId++, type: 'car', brand: 'Skoda', model: 'Slavia', price: 1350000, year: 2024, specificType: 'gasoline', imageUrl: 'https://imgd.aeplcdn.com/1920x1080/n/cw/ec/175951/slavia-exterior-right-front-three-quarter-8.jpeg?isig=0&q=80&q=80' },
+            { id: nextId++, type: 'car', brand: 'Honda', model: 'City', price: 1200000, year: 2024, specificType: 'gasoline', imageUrl: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/130591/fronx-exterior-right-front-three-quarter-109.png?isig=0&q=80' },
+
+            // Indian Cars - Hatchback (Under ₹18 Lakhs)
+            { id: nextId++, type: 'car', brand: 'Maruti Suzuki', model: 'Fronx', price: 900000, year: 2024, specificType: 'gasoline', imageUrl: 'https://cdni.autocarindia.com/ExtraImages/20240514050245_Fronx%20_1_.jpg' },
+            { id: nextId++, type: 'car', brand: 'Toyota', model: 'Glanza', price: 750000, year: 2024, specificType: 'gasoline', imageUrl: 'https://www.indiacarnews.com/wp-content/uploads/2024/10/Toyota-Glanza-Festive-Edition-Price.webp' },
+            { id: nextId++, type: 'car', brand: 'Toyota', model: 'Fortuner', price: 900000, year: 2024, specificType: 'gasoline', imageUrl: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/137767/fortuner-legender-exterior-left-front-three-quarter-5.jpeg?isig=0&q=80' },
+            { id: nextId++, type: 'car', brand: 'Toyota', model: 'Endeavour', price: 750000, year: 2024, specificType: 'gasoline', imageUrl: 'https://5.imimg.com/data5/ES/HE/QF/GLADMIN-82303572/1550756193390-500x500.jpg' },
+
+                       
+            // Additional Indian Cars
+            { id: nextId++, type: 'car', brand: 'Renault', model: 'Kiger', price: 650000, year: 2024, specificType: 'gasoline', imageUrl: 'https://stimg.cardekho.com/images/carexteriorimages/930x620/Renault/Kiger/12295/1764934839670/front-left-side-47.jpg' },
+            { id: nextId++, type: 'car', brand: 'Nissan', model: 'Magnite', price: 600000, year: 2024, specificType: 'gasoline', imageUrl: 'https://etimg.etb2bimg.com/photo/104237350.cms' },
+            { id: nextId++, type: 'car', brand: 'Maruti Suzuki', model: 'Dzire', price: 700000, year: 2026, specificType: 'gasoline', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsvD-0h2EeFYU8NOhW4VCIb0rR1twOwZbfcQ&s' },
+            { id: nextId++, type: 'car', brand: 'Tata', model: 'Tiago', price: 550000, year: 2026, specificType: 'gasoline', imageUrl: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/39345/tiago-exterior-right-front-three-quarter-34.png?isig=0&q=80' },
+            { id: nextId++, type: 'car', brand: 'Hyundai', model: 'Exter', price: 650000, year: 2026, specificType: 'gasoline', imageUrl: 'https://stimg.cardekho.com/images/carexteriorimages/930x620/Hyundai/Exter/10444/1710309786917/side-view-(left)-90.jpg' },
+            { id: nextId++, type: 'car', brand: 'Mahindra', model: 'XUV300', price: 950000, year: 2026, specificType: 'diesel', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Mahindra_XUV300.jpg/330px-Mahindra_XUV300.jpg' },
+            { id: nextId++, type: 'car', brand: 'Kia', model: 'Carnival', price: 3500000, year: 2024, specificType: 'diesel', imageUrl: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/138947/carnival-exterior-right-front-three-quarter-20.png?isig=0&q=80' },
+            { id: nextId++, type: 'car', brand: 'MG', model: 'Astor', price: 1100000, year: 2024, specificType: 'gasoline', imageUrl: 'https://stimg.cardekho.com/images/carexteriorimages/930x620/MG/Astor/11413/1719383205969/exterior-image-164.jpg' },
+            
+            // Accessories - Helmets
+            { id: nextId++, type: 'accessory', brand: 'Steelbird', model: 'SBA-1 Full Face Helmet', price: 1500, year: 2026, specificType: 'helmet', imageUrl: 'https://m.media-amazon.com/images/I/41WSjo7JZbL._AC_UF1000,1000_QL80_.jpg' },
+            { id: nextId++, type: 'accessory', brand: 'Vega', model: 'Crux Open Face Helmet', price: 800, year: 2026, specificType: 'helmet', imageUrl: 'https://5.imimg.com/data5/SELLER/Default/2024/8/444375263/SY/YS/CA/225176853/vega-crux-open-face-black-helmet-500x500.jpg' },
+            { id: nextId++, type: 'accessory', brand: 'Studds', model: 'Thunder Full Face Helmet', price: 1200, year: 2026, specificType: 'helmet', imageUrl: 'https://shop.studds.com/wp-content/uploads/2022/06/THUNDER-BLACK-3.webp' },
+            { id: nextId++, type: 'accessory', brand: 'LS2', model: 'FF320 Stream Helmet', price: 4500, year: 2026, specificType: 'helmet', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRS75D8eVwpcskb5m0XTjurklk6F419Upxug&s' },
+            
+            // Accessories - Covers
+            { id: nextId++, type: 'accessory', brand: 'Autofurnish', model: 'Bike Body Cover', price: 350, year: 2026, specificType: 'cover', imageUrl: 'https://www.autofurnish.com/cdn/shop/products/51b4xyr_TTL._SL1080.jpg?v=1755523328' },
+            { id: nextId++, type: 'accessory', brand: 'Mototrance', model: 'Waterproof Bike Cover', price: 450, year: 2026, specificType: 'cover', imageUrl: 'https://4.imimg.com/data4/BB/UG/MY-8965901/mototrance-sporty-arc-blue-freedom-bike-body-cover.jpeg' },
+            { id: nextId++, type: 'accessory', brand: 'Carmate', model: 'Car Body Cover', price: 800, year: 2026, specificType: 'cover', imageUrl: 'https://m.media-amazon.com/images/I/41gJfnuMQyL.jpg' },
+            
+            // Accessories - Car Items
+            { id: nextId++, type: 'accessory', brand: 'Oshotto', model: 'Car Dashboard Camera', price: 2500, year: 2026, specificType: 'electronics', imageUrl: 'https://m.media-amazon.com/images/I/71HhMgw4nJL.jpg' },
+            { id: nextId++, type: 'accessory', brand: 'Wrangler', model: 'Car Floor Mats Set', price: 1200, year: 2026, specificType: 'interior', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxSZzJi4nUDjhe1ZFkF2LnPOdnKGGTCFzFFQ&s' },
+            { id: nextId++, type: 'accessory', brand: 'Bosch', model: 'Car Wiper Blades', price: 600, year: 2026, specificType: 'parts', imageUrl: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxISEhUSEhIWFRUXGBcWGBgYFxkXGBcYGBUXGBcWFhYbHigiGRolGxYXITEhJSktLi4uFx8zODMtNygtLi0BCgoKDg0OGxAQGzUlHiUtLS4vNy8tNS0tLS0tLS0tLS0tLS0tLSsrLS0tLS4tLS0tLS0tLS4rLS0tKy0tLS0tLf/AABEIAL0BCwMBIgACEQEDEQH/xAAcAAABBAMBAAAAAAAAAAAAAAAABAUGBwIDCAH/xABOEAABAwICBQYICwUGBQUAAAABAgMRAAQSIQUGMUFRBxMiYXGRFDJCUnKBobEWIzNUYnOSk7LB0UOCwtLwFURTg+HxJDQ1oqMlY2Sz0//EABoBAQADAQEBAAAAAAAAAAAAAAABAgMEBQb/xAAsEQACAQIEBgICAQUAAAAAAAAAAQIDEQQSITEFExRBUWEycSLwoRVCgZHR/9oADAMBAAIRAxEAPwC8aKKKAKKKKAKKKKAKKKKAKKKKAKKKKAKKKKAKKKimt+u7NlKBDjww/FklAg5+PhImM6AldFU9pPlafU3DLbLSzGZUXoz2BMJBniTlNILblWvBPOrbUZywNQmIEDxyeO+gLwoqu9T+UpNw4GXwlJVASsSkScgFAk7SdoPDLfViUAUUUUAUUUUAUUUUAUUUUAUUUUAUUUUAUUUUAUUm0jftMNqeeWENoEqUdgzgdpJIAG8moVe8rNgn5JLzx+ijCO9ZB9lAT6iqye5VlqEs2WXF15KI/dAM99M95ykXyv2tqyPooWtQ9ajhNAXLRVAOa33Txw+H3Lh81lKWj6ubE+ysRoi7uNtnev8AW+pyD61YR7aAvK703atfK3LKPScQn3mmm51+0Y3tu0H0Apz8ANVlaahaQV4tgw19YtCvcVmne15ONI+U9atfVpUT7EJ99ASdfKfo/wDZl530GVfxRSZzlPb8ixuz6SEIHfiNIG+S58/K6SUepLUe1Th91KW+SW28u6uVdhbSPwGgND3Kg75Nh9u5bR7MJpKvlPut1rbp7bgK/DT63yWaPHjc8v0nVD8MUpa5NdFp/uxPa88fYVxQEQc5TL7cLJPaHle40nXyk3/+NZDsbe/M1YKNQ9GD+5NHtBV7ya3o1N0cP7jbetlB94oCrbjlMvhkX2SDtLbRxDsxGPWZqD6Z0gu5uFvOLK1LjMgYskhIBAgbANldIp1XsRssrYf5Df8ALWxOr9mNlqwP8pH6UBy6pP0Vn93/AFrwNQABA7hHqrqX+wrX5sx90j9K8OgbQ7bVj7pH6UBzRoy4Lbra0qAKVAgkSno59IRmMtkVYKeUm/8A8azPa29+Rq0las2J22dse1lv+WtK9T9HHbY233LY9woCu2+Uy+3+BK7Evp95pU3ynXe+3tldj+D8VTNeoujT/cmR2Jw+6kr3JvotW22j0XXk+5YoCPtcqL3lWCf3bpCj3Yfzpa3yno8uxuv3Ahf8QpSvkt0d5KXUdjyz+ImkTvJJaHxbm5T2qbUP/r/OgFzfKfY/tE3DXpsn+Emlttyh6MXsu0j00rR7VJFRpzkqcHyWkVp9JqfalafdSK55NNIDxbph36wLH5LoCx7XWGzd+TumF9SXUE9005JUDmDIqj7rk/0kkZ2lu99WptPvwe+m5Wr97b5+AXLR4sFZ9qCugOgqK59RrRd2+Ru7tk7g98Z7HQKd7LlIvkx8fbu/WNKSo/dGKAuuiqwteVRwfK2aVACSpp9JOXBtQn20us+VuzVk60+11lKVp70mfZQFg0Ug0Lpli7b523cDiJIkAggiJSpJAKTmMiN4pfQDLrboAXzHMFwtjGlUgBU4dxBI494FQc8kEuH/AI1Qbygc2MewTKgoAZz5OyKtKigIJZ8lNgkfGF970nCkf+MJPtp9stTNHtRgs2ZGwqQFq+0uTT9RQGDTKUiEpCRwAAHcKzoooAooooAooooAooooAooooAopPpC7Sy0t1R6KEqWexKST7qpHTvKdcPOBTLi2UBMFCAlQJmZlSZB3ZUBe1Fcw6Z1iduFpW868rCCEkuLEYsiAGyIB3msbfWJ5AATlhAAgrnLIZ4pJoDqCiqm5MtdnnHhavY3AsnCSSooMEzJzw5Zjdt2TVs0AUUUUAUUUUAUUUUAUUUUBitAIggEcDmKZ73VOwdzcs2CeIbSlX2gAaeqKAhF5yW6OWDgDrU+Y6o+xzEKYb3kgIzYvD2ONyftpV/DVq0UBFtQtVFaPbWFu84pzCpQAhKSEwQk7VbdpA2DKpTRRQBRRXilAAk7BmaA9oqj9Mcp984tXMqaYRJw9EKcw7sRXInsFMi9cLtRPO378K8xQbz3AYQI27qA6JWsASSAOJypovNa7Bowu7YB4c4kq+yCTVHt6LefOIWV3cE+W4HSD+/A9pp4stRtJL8WyYZG4uqbPsGNXfQFgXXKboxGSXlOHghtZ7iQAe+kKuVBs/J2N2rgShKQfXiNM1tyc6RV8pdstDg2Fr9kIFLmuSZJ+VvnVHfhQlA7iVUBquOU658ixQn07hM+tIAikDvKRpD/4SB1h1Z70qj2VI7bkpsE+Op9z0nI/AlNODPJzotP91B9Jx1X4lmgK+uOUC/P98ZR9WzP4xTa9rxeHxtJrHotMj3EVcLOpujk7LG39bSFHvUDTixoq3R4jDSfRbSPcKAoNWuTm/SVyexQR/EaP7fdXsu79fo3C/cAa6GSgDYBWVAc1XL906ClTdy7IICl844oDdBKabm9DXUQLV4xvLTmfsFdTUUBy2dCXe+0dH+U6fck1gvQ7++3e+5c/MCup6KA5esGXWnAsofbiSFJxoWk7JSrDllNPHwpcRtv7xPpPFXviuiaKA56a1zf8nSb/AO8Eq96qWsa93w2aRJ9Jho+4E1ebluhXjISe0A0huNXbNzx7S3V6TKD7xQFWM8ot+Nj9ov0mnR+GKWM8pt6PHZtXPQWW/wAajU3e1E0arbZND0Rg/CRSF/ky0YrYypB+i86O4FRHsoBpteVBZ+UsF9rTyXfZA99LGuVK02OsXLPWtsR7FE+yk7/JJan5O4uEdRKFD2on20he5KXU5sX5HUprP7SVj3UBKbXlC0Y5sukp9NK0fiSKe7HS9u98i+056DiVe41VFzyd6UE9O2eH0lEk/bbMd9Md5qhfNzzujSrrbhfcGl/w0B0BRXORvn7TfeWvBJW42mfQUkA9lb7XXvSKM03qlDbDiUK9qkzHYaA6GoqB8m+uzt8pxm4SjnEpxpUiQFJkJVKSTBBUnMbZ6s55QBRRRQBRRRQDO/qrYrSEKtGcKTiADaUiYIzCQJ2nI0tstFsM/JMtt7ughKfcKV0UAUUUUAUUUUAUUUUAUUUUAUVqdfSnac+Akk9gGdIjpxkGMQnhjbn7OOfZQDlRWhi7Qswk57cJBCo44TnHXW+gCiiigCiiigCiiigCiiigCiiigCiiigPFJBEESKZ77VSxe+UtGSeIQEq+2mD7aeaKAatB6u2tmnDbspRtBVmpZBUVQpxUqUJOQJyyp1oooAooooAooooAooooAooooAooooAooooApHpS+DKMR27sp9cDM9g2kgb6WVG9MrxXrCDmlCFvEcSgGP8AuKD+6KAxU3veSFkqTLajKRiUlMKAydWMQknopyCRxkYbTGGBGyIyjsqHsO4pcVmSrmU5kDJxk4sthLilKJG3CnhT94C954+29/PQDbcMDHCEhs4lYMJhOIKUkAj9mtWEwsZEyFA5Au2htIc6khXjoyVlEg7FRuORBG4pUKj15tdVMKbQEqIJO1y4zk5zjSlQJ2EUpsX/APjm1DIPsFZG6fi1D+L7RoDDXnWtdgWQhpK+cCycRIjBg2QPpeyosOVV2Y8Han6xX6Uo5Y/Gtex73tU2WuvCEWYtPBgohvm8SlCDlGIpwz1xNclSpJTazWPqMHgaUsJTqcnPJt3/ACtbV6k81P1tRfBScBbdQAVJnECDliSqBInI5ZZUi1s18btFllpHOujxs4Qic4J2lXUO+ozyVWwDrz5WmUNFOCemZKVFRHm9ACeJNNOotim8vQXxiGFb6wdilYhkeIxLmOqnNm4Rtuyj4dhYYirKV3Cmk7e32uPlhyou4vjmEFG/myQodgUSD2SKsA6cY8G8LC5Zw4sQ7ojbinKOOVR7lB0CwqzW6ltCFtAKSpKQnIEApMbQR7YqJ6q2zl1o68tUZlKmnUDiZxFI7ea7zVlKcZZXrpoZSw+ExNFV6ayJSSlrfRta/wAim95T7gqPMstpQNy8S1RxOFQA9vbUm1N118NWWlslCwnFiT0myOs7UnqO3jUC1W1oXo8uNqYCsRGIKJQ4kgRGYOXURxqwNTtYbJ9S0stBh1XTWjCkFcZFQKcle/PZVaU23rL/AAa8SwlOlTkoUNFa0lK/+0a9btem7RXMto514eMJhKJzAUdpVGcDvFRmz5Un8XxjLS07wgqSodhJImmbVO1TfX457MLK3Vg+VtVh7JIy4CKtjSerVrcIShxlMJIIwjARG4FMGDsIqYupUvJOxWtTwOCy0atPNJq7d9vr9Qzae13S3as3VulLgcXghRKSkhKiQY8oFMRTpqfptV5b88tAQcSkwkkjoxnJqL8q1shq0t0NpCUh6AlIgAc05sFR3VrXhdkzzKWUrGJSpKyk9LdABqXVyztJ6WKU+GxxGCU6EPyzPd621+l4JRda+uovvBeZQU8+lnFiMwVhMxxzqfVQ1tel/SDbxSEly5aUQDIEupynfV81ajNyvc5+LYSGH5ajGzcdfsKKKK3PHCiiigCiiigCiiigCiiigCmfTOtFlaLS3c3LbS1AqSlRzwiZUeCcjmcsjwp1edCElSjCUgkk7AAJJPqrknXG+ur++eusC+mqGx5jYybTkcuiBO6cRoDqrR+mrZ9OJm4acSMiUOJUASAYMHIwQY66Xg1yjrHph1hlu2aeWDErUFkKVh4nbBVP2RWWrfKLpCyWVtvqeaCiS26cSVAnyZMoOfk9xoDqyo7rCnm7hi4I6IlC/RIM+w4v8s1nqTrS3pK1RctpUiSUqQrMpUkwQCNo4Hr3U83dslxJQrYe8HcR1g0BXN606y54ODkp9C21nPJxaE4hxAISrbuImpT/AGJefPv/ABK//WtT1kW8KXW+dQhQUhQxdEghQgpzQJElKpRkOkBkHH4RMecPvGv56kghT7b6nnrULxLdU23jAjJBc5xwpkwkBc5nMkbTUo0W0F3ZWn5Nlrm09qsMQfRRPY4mhDJcUssNYecPTcViIPaTBUnOcCOiTMqEmXuxs0tIwpk7SSdqlHapR4nu3CAAKArvlj8a17Hve1SbROt1i1atsuWhcWlsJUcDUKMecVTHXFWNpTQtvc4efaS5hnDi3TEx2wO6kXwOsPmrfcf1rnlSlmckz3KPEMN00KFWMnlu9Hbu/wDpWXJvbrXfIKB0UpWXOGBSSAknrVhj0eqtbiXtE30hOSSrBPiuNKyieyJ4EVclho5lhOBltLaeCQAO0xtNeaR0ay+nA82lxO2FCYPEcD1iqqhaKV9UaS40pV5SlD8JLK13trr96lWa26+m6Y5htotpVBWVKBJAM4RGwSBnTtq4lzRmjnLlTSlOOkEJg9BMQhTm8J2qPpAZVLbHVOyZUFt26AoZgmVkHiMRMHsp6KatGlK+aT1Ma/EKHLVChTtC93d6v13Kvtte7Z5vDfWgcWB4yUIUFepRBQewmmbUJhTmkUKaSQhClrO/AgpUEpJ3+ME9edWZdanWLisSrZEnM4ZRPaEkCnLR2jGWE4GW0tp2kJESeJO0ntqvKk2nJ7GsuJ4anSnGhBpzVtXovop7SVu9ou+xpGQUVtk+KttUyn1A4Tw28KftJcqCygcwzgXIKishSYG0ACJniYqxdIaPafRgebS4ngoAieI4HrprtdTbBtWNNumRmMRUsDsSokU5U46Reg/qWFrRjLE03KcVbR6P7IZr7pNVzo+1eU0Wip7xTn+zc6SfonaJAp15NNGsuWWJxltaucWJUhKjAiBJFS/SWiWLhIS+2lxIOIBW4wRPcTWejtHNMI5tlAQiScI2Sdpq6pvPmfg5anEIvCciCaea/q2unkpq6bCdLYUgJSLtAAAgAc6nIAbKu+mlerVoXeeNuguYgvHGeIGQrtmnapp03G/spxDGxxKp2XxjZ3CiiitTzgooooBivNcdHtLU27eMoWkwpKlgFJ4EVp+Hmi/n9v8AeCqA5Qv+p3n1yvcKj8V2Rw8Wr3MHVaex0/8ADvRnz63+8FHw80X8+t/vBXMVbGrYqiN+zLb2DfR4eK1bCqt9jpj4e6L+f2/3gpPpLlE0e0mUvc+o7EMgrUfyHrIqltD6qkwpzoDhtWf5fVnTrc6Us7LoJGJwZFCIUv8AfUck9hM9Vc0lH+01Tfckun9bL6+aWy3bot2VjCouKKnCneITATOw7cjVSaVS/ZvKnCpK4OIDLIRH+lLtK643C5GMMJPkt5rjrcOc9acPZUXeu0qJKsaydpUoye05E+uoytlhw0iwsv8AOONc62E5FqVoOXnDrkkUkfSyYKWVIiZkKIOyN5660IuGwZDZB4hSv5qyW+leSi4B6WIdsK/WpysF3cm2sjFjbMsvpUwkpxBawebUV9I9PPCc9ioqejX/AEX8/t/vBXMdldPtSWVyk5qCcp9NoiFdpCq2qeaezgNr6vEP7uZT6pHoikUr6kP0dMfD7Rfz+3+8FHw90X8/t/vBXLq0FJhVeV0LDxfcy5r8HUfw+0X8/t/vBR8PdF/P7f7xNcuRRFOnj5HN9HUfw90X8/t/vE0fD3Rfz+3+8TXLkV7FT08fI5vo6r0frbYPqwM3bLigMRCVgkAECT1SR305f2g1/iJ7xXMuobykXDhQJUWVJTGWZcb2Rnuq1NWnStMrJUesmoeGVr3K87Usbw9r/ET3ivfDW/PT3io0lCSQYzGIRGW0TtGWwdtZAJMjhtIyzkg5bRs/Ss+Ui+dkkF42csae8UeGN+envqLuJMZFInYScj3Z7K9SinKQ5jJOLtvz099Hhjfnp76jGE9Z7IHvP9ddYrxgdCFH6asIPEkhJz9VOSvI5hKhdo88d9e+Eo84d9RlLlbEuVHKHMJF4Sjzh30eEo84d9Rh7SDaUqUpaQEeOSR0cpz4baj7dxc38holi2zCncwtwA7ET4ojft7Kh07bllJsnDusVmkkKuWgU5GVpyPA55Vts9NWz080+25G3CsKidkxVE6ctCw+po9JAIUjcFIOaT2xkTxmn21WmxvU4T8U6kE8EhRMQd8ECqqNyzdi4vCkecO+tqVA5ioobj+oy79lSSwMtoPUKmcMpWMrnM3KF/1O8+uV+VMCROQqS6/26jpK73AvKjidmwb6z0RoDYXBA3J3n0j+QrrdZRijHI2xs0VoZbpyGW9R8UdnnH2VKm2rezRzizBOWI9Jaj5qEjM+rIbyKSaR04hkFDeFShl/7aIyhRHjK+iDlvI2VCdJaRcdWVSVKORWqJjcEjYlPUMuquaUnN6m6ioofNPa2OLBSklpB8lJ+NWPprHij6KfWTUTXdqIhIwJ4D9a2IslHMifWKUt2B4e0VpGnHyUc32Q2pYmtibenMWavN91e+CK801slFFHKQ28xXht6cTbK8016LRfD2j9afj5IvIaglSTIrep0L25L84bfXG3t29tLVWKvN9o/Wk7lgrzfaKpOEX3Lxk/B43c+Q52hX5g7B7jvgya2KQUnq41ghhRGFSSRu6jxHX763sWTw6Cm1KTuI9nZ+XZsyhNwdnsWlHMYCiK3mxdHkH+uqtNdaaexztNHkUAVlFEVYgddWDDp2QUEGZgDGjMxmN2yrU1WWYgkZcIIO7bw7KqzVj5U+ge/EmKtDQSS38oMOwmYG3OYB6PYR7KnsV7kxb9fAbI2AyfdSdwsh5JVhS6QUpUclLAjogzBAk5HPhWBdAzKojPPYANpgQd9bF3IQklR6I6WeZESTn6/dXM0bJig8ZPYBnwz4+zZQP6yik6HiQMQBM7jlG0HPfsrVcukkNh0NKVmno4j0SCrqIggRA2nOlhcWr2bB6/9tleHOtKbgqRKR0swJ6IUQYGcGEkjbwrLnVEiAIzxZ5jLLCN+dAZBH9RTXpy4YbSnnlLKsQU0lvJzGNmEA5jcZygwevVd6XWt3mLQc67EKP7NrPxlq47ej/tW5jRfgyHH0kXF3AJWsKVAJzwJGeEAkwM8suFUnUtsaQp5nYSN6KU4pLl6AJILdqgjapXjuSekZOZOQ6tlSPQl4p1vEWubAUQkZRhGyIJGWaT1p3U1NaPB+MugVKVmGiouFWIEhK0kZQpSoSOik7Duo03rGm06TpBXEIZQdnp9eQjtNc2Zyd2dUowgsq1Y0coGhpQl2UjAopG6W1Z7PoqnvNRW0tnLjC03mhGRWdiRMkJ4md1ZXd49euy/iV5jDe3qxkZJHtrLSb7zMMOpDcJB5tGSYIyJI2/75VqkluYNt7Ewtr5AHNh1LikABRHZv6+PXU+0MqWGzxSPdVB2dytDgKhhxCI+idntq9dVz/wjH1afdV6rvBP2ZwVpWKg1pt22726eUQDzhlSjkkbABw6gMzuqJ6Q0yXJQ2cCNhJMLUOvPoJPmjM7yM01jym6XV/adw0CTheIE7EzE4QPKIOajnu2ZVBfCVb1Guc2LK0cm3SnDzYJAiStPsEZDqp4aZtspabJyOa0xsnZE7Ouoba6t3jsrbQ8tBUcKkNhQOZBzA2gyD1inmy1Uv8An0HmrjDgSD8XAnmIz9dSCaaLOh1EIWGm1kxC1NgKPBK5ieowafdL6pWiG8TdukqG47yfFHrIw/vg7qqO71L0ioq+JuiCVeaBEncVVLNSdLaRsotr63fctD0ca8JcZByyIUSpvPxdo2jgRJP9FaqaMfZQ8i2ThWJjErI70nPaDI9VeO6q6LEzbphJgnGqZ35TmB+Ve6tXHMXC7cqBQ9LrZGwuAAuBPUpJS4AMhJFOj2iEKUsFaoUvGemoAcUhHikSfbQDJpHV/RDC0NusQpzxYDqhGNKJUpMhIxLSJPGkSrLQcGGlEhQSAlD5UvFjIU2kCXEkNr6SZHQNSLWDQLFy6w446UFBwoAwdI4kuwkqSSlUN7UwYmkDmqLDjZSLpZQQlKJDKg20grKUIlHklRIX4wwJzyM5tzudMI0MqzN37/thENA6FxqRzSpC0tkw7gxqUEYQsjCSFEAwcjtpdZak6LdQlxtmUqEgyrjGw1v+DLKgps3ClsFwOcyrm1Ix87jWCcOJWJYVIJ8pXqetD2KWGUMoMpQIBy2TI2Zb6lOXczqKkl+L1Irp/UaxRbPOIZ6aG1rT6SUkiRGYkVUTN5s+LR3VfGsnOc2/GLm/B3J8XDiwOfvT4vs2Rnz5bkhPRzVhJT1qwkpH2oFaIxFDl2FgYUojPNI4SCMwN4PdUZeSQoyZzOfHPP19RzG+KcdCKUUnF5xg7zMlXtPt6qbksdA4lgLSejJAC0DrJ2jYMs9nZrCThKxnNZlcBRFYNKrbXckcjHjVNgreUkED4tRzMSAUkgdcCY6qnmg7iADi7ds57ZO/aarzQXyis46B/Empzo50GCkJTkNkgEgZ5ZwT3dlSiGSsPIxBeAYowlflRtCduyeAoOkgAFQvjkDKcsyoDYB17KZ+f/r/AHFZN3pPSSdu+doO3PfTIMzHZV2VEQvBBkymSr6OeycjPDtradJNzhxJxCDGRUB2bQDPtqPrdnyynrCQomNicyIHXn2VpdcxQG7cF5RgOCQVgbQoGQqJGeUVWUUtyYtt2RI3dLIAxFaQBMknh1b9lI2DcXgwpVzTOxTsFC3fQSZKEnvpJc2CWE47peNwCcEkpRGzENqjA2dW6o5fabvrlxDdq44EqEpLZCeowRlkdpmB15VyVKl/idUKdtyyNCPNWo8HU2GhMBY8VZ+mfJUeMkHcd1ObFvzcwZMRiVlCZJE9Qnq2VCWudtWwLu855Sv2agHCfotiMap3kkA9VLbfR15dN4FFVrajPCTidKeHUnqOzurE2sadO61JbUpqzlx5RILnjESScKBwE026P1MdUfCL50tgmYzU4qSBAAmJKgMpOdStnR7dqyvwJoF5ODNQxqUFEZyM9kmBwrwaNMh25cKTOSUuLUoz0kpBBGGFdLCkEApEGKo3Z6GkacWs0np/Ir1ZatUhaLZvBgVhUSOkrLMknPxsSeEoVUS5SLPNDu0pUUK9FfSb3mYhYnrqZJvUMplYDLQBjGemozMxtPlEk5yZ41B9Z9c03INvbM84CQSojzTIPVmKtBNlJuKd1sRxwS0iBGGRJ3jcRxq8tUV4rK2VxaQf+0VTDehlrIL6xnEJSeiPSO0+6rq1YQE2jCQIAbQAOoCtasZJXkYQlFuyKa1t1RsHr+4dcv0NOF4qUlS09EgjLDE+2sbPk60CCCvShVxAcaSD1ThmmDX4n+0rvM/LK39lMWI8fbWkcLdJ3M3iLO1joLRd9om3bSyzdtJQnEQOcBMqUVKJJzJJJNLhrJo4EHw1n7xPCK5vCjuJ76OdV5x7zVuk9kdT6OjfhJozfetfbFJbvTeiliDetfeJ/SufQ4rzj3mtvOq8495p0nsdV6LZu9N2DYSlu6CsCgtpSVBZQpJxAHCPFzWI+meAp9PKJo5WalKnbsMA74kiqGK1cT3msCs8T3mnSewsV6L1f150UsAKxqAmN22J8ocBWr4W6HkZLyM7d+HDJ6eeU7eJqji6rzld5oDq/OV3mo6X2W6j0XevWvRBghS04SDtTsCirDClEQST104W3KDo1tAQheFIEAYkfz1z/wA8vz1d5o8IX56vtGnSvyOoXgvrSnKFYOMuNoclS0LQOkiJUkgScWQk1VbNmgAfGDKNySPx1GkvuEiFKJ3QST6qFXLmwuL+0f1p0z8k9QvBIHrVCM0qnM5HCT0lKUcweJO6oY82SozxI9tOXhC/PV9o1pCK0jRs7so6t9Eamk1tIr3DXtbLQybF2gkEuEAScOQ45pyqY6OjcoHfkI9UHuqG6IUAtU+afen9KmWj0FMJWlSTlKSMxltUIy/1qQOUZzPVGff/AFxr1S8ROITO0RhB7oyrQ5GGHElsbwFAEDd0t2Uccu+nGx0XiTzz5LbXAk4lxwTu9WfGN9Z1YwWohTcnoJrS0W8rC2AAPGWckjjJ3n+jW6/0vb2LaktQpZyU55Sssoy6I259RgU1ac1uSYt7VuUggBKY7AZ2E55buAOZpJovUl97E7duYGyd+RMEHKc8RiI25kZ1wVKjm9TshTUdhIy65fOBZWA1OY28QpGBJKlE59EbQczwmVpaKYaDbI8Hb3uLhT6+xIySOoTHVWlOk7KwSEW6AFbJUEzJGQA2DPj6hUcd0tdXyillJJyVxJEwZmMsxmYEDZVDUk9rprRVsrCtwlxWRcWla1E7D0gD/W2KkGi9LISnJ1L1sqQHEqCubO9KjPi9uaezYwaH5OEFZce6c54Z6InPpr2nsEDto1g03YWPQZIW7GEIbjAOoxl746ttLEXJuVIYTJKUIEdJR2gZwDv2nvqDaV15aaVgtElxwmOdX0jsiRwAG/hUFvtK3FyRzqiGxEISYhPmjcn1TWNrhRklI2zJmezbvraFFvcylV8DmsPXS8dy6pQkwkHr38KerRkJThb5tHAKxZ9mEGaaWVIKZWFqOWAhUAEbMRjpZDZlspZaP7pyrspxjHY5Jty3HFRq1tW/+VY+rT7qqAOzVvatH/hGPq0+6scZ8UaYfdnPOv3/AFK7+uV+VMEVINfh/wCpXf1yvypgNdFP4r6MJfJnlEV7RVitzwVsFYGsk1KKs9IrAitkV4asRcUaGKQ+2V4QJyKvFCoOAq3YQvDM5RM082TS1EovlnpJbScapdweFsk4lEzB6USchJyEGo5FYYaylG5qpEoOh21ByGsJDZ6JCkrQ7zTqkEJ59XNpUUtgBZWVKJAABFZ6Ct2BpLF8W2zbBTxKipSSWhKFKkqKiXFIySNgyFROBwoiqZH5LZvRbdlo21XfeGJ5p9Tjtm+IdLSWkqKg+8kEpKyHW/EUJ6QyzpnZ0LYulhwBBVcO80ULdWkJWybgvuHCoH4zCxhEgSqBE1XhQOFBSKoqT8luYvBZzmrejUulHNpIcdCEnn1DmUmwLxKYWQYdTHSKhnEnKtujNB2d0thbluyho2dpseUFYlylwgBwZoVkVKzmMlE1VeEcKMA4CnKdvkTnXgs1jVOyS1aFxrouFnnXudIw421qhwc5CecXzaE9AQFKzmDUS1ytWGXy0y1g6LalSrEUrKekgQ6sBGxUElQJiYpBc6ZuHGksLeWppOEBBOUJEJB3qAGyZim+KtCEk7tlZSTWiFmiAMSp80x24kzPqn2VK7CSQkArUTkE5k+ucxHHKopogS4BMTl3kVPmbzwRtttlADjqlJU6c1eOUiBuHYe6s61bI7Lc0pU82rFimWbT425IceHitjNLZ3TxV/WVJF2V3fkrdVzLG9SjhlPAfoIGe/bTy5otu1Sh5aefdVMFfipjggfrUC1h1tuXVBOLCDMdWcQAIj1R664223dnWkkrIlS72w0cmG0hS96lbe2DBz68I7aiOm9cnH8ZQYIgzsOHZtyjanIR66U6ratouStbjijgOeQkkiZB2J7vXUjsOTO1cUXgtaWwcKmhmFZeeTiSDv38CKElcWtrdXjjabdKnXDkQkZJwmcSlbEJwlOZjYauNnSFroxlDTqg7cRKmmEyVK34o4TEnPKarzTOt7jZVaWTSLRoSk8346oylS4/1O8mo40SDiklWfS8rPbJq8YORSU7Er0/rxeXsoSRbsnyE+MobIUR/t1UzWjDaTxORJOcneDvP+lJUphKTPjYh3R+vsrchZEeojqrohFIxlJsVFMCQQYP+xAO7L3VinJUiRGYkevZQ84SlSic8WeQE79g2bK1tL45wIGfq/Md1bFB2YzCgsLHHD0IM5ZRGGctm+trbkeyeoHeRwmkywo9NSyqMKQDJywkjMncBFY8+ch6ssu/jVkVaHJhzOrt1XA8EYgQObRl6qoq0VV6aq/8nb/VI91c+L+KNKG7P//Z' },
+            
+            // Accessories - Bike Parts
+            { id: nextId++, type: 'accessory', brand: 'Ceat', model: 'Bike Tyre 100/90-17', price: 2200, year: 2026, specificType: 'parts', imageUrl: 'https://imagesm.plexussquare.in/CHERRYAGENCIES/Images/26-02-2024/1708933991362.jpg' },
+            { id: nextId++, type: 'accessory', brand: 'MRF', model: 'Bike Tyre 90/100-10', price: 1800, year: 2026, specificType: 'parts', imageUrl: 'https://www.mrftyres.com/images/tyres/patterns/zapper-c1-scooter-right.png' },
+            { id: nextId++, type: 'accessory', brand: 'Exide', model: 'Bike Battery 12V', price: 1500, year: 2026, specificType: 'parts', imageUrl: 'https://batterywala.in/uploads/f185badc8f2f5703b75e75f3ac381460.jpg' },
+            
+            // Accessories - Safety & Tools
+            { id: nextId++, type: 'accessory', brand: 'Glowseen', model: 'Riding Gloves', price: 500, year: 2026, specificType: 'safety', imageUrl: 'https://shop.studds.com/wp-content/uploads/2024/05/SMG-6-RIDING-GLOVES-BLUE-3.jpg' },
+            { id: nextId++, type: 'accessory', brand: 'Rynox', model: 'Riding Jacket', price: 3500, year: 2026, specificType: 'safety', imageUrl: 'https://openroad.in/wp-content/uploads/2024/03/Rynox_Raid_Black_Red_Dune_Neo_Trail_Offroad_Jacket_Red_Jacket_01_1300x.jpg.webp' },
+            { id: nextId++, type: 'accessory', brand: 'Tata Agrico', model: 'Bike Toolkit Set', price: 800, year: 2026, specificType: 'tools', imageUrl: 'https://www.tataagrico.com/wp-content/uploads/2024/12/4-46.jpg' }
+        ];
+        displayInventory();
+    </script>
+</body>
+</html>

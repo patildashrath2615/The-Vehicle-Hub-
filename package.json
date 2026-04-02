@@ -1,0 +1,13 @@
+{
+  "name": "bike-car-shop",
+  "version": "1.0.0",
+  "description": "A bike and car shop management system",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "keywords": ["bike", "car", "shop"],
+  "author": "",
+  "license": "MIT"
+}
