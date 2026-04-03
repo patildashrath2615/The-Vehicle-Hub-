@@ -140,15 +140,7 @@
             border-radius: 5px;
             text-align: center;
         }
-        .remove-btn {
-            background: #f44336;
-            padding: 8px 15px;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-        .remove-btn:hover {
-            background: #d32f2f;
-        }
+        
         .buy-btn {
             background: #4CAF50;
             padding: 8px 15px;
@@ -202,12 +194,7 @@
             grid-template-columns: 1fr 1fr;
             gap: 15px;
         }
-        .remove-cart-btn {
-            background: #f44336;
-            padding: 5px 10px;
-            font-size: 12px;
-            margin: 0;
-        }
+        
         .print-bill {
             display: none;
         }
@@ -443,10 +430,7 @@
             }
         }
 
-        function removeVehicle(id) {
-            vehicles = vehicles.filter(v => v.id !== id);
-            displayInventory();
-        }
+        
 
         function filterInventory(filter) {
             currentFilter = filter;
@@ -478,7 +462,7 @@
                 html += '<p><strong>Year:</strong> ' + v.year + '</p>';
                 html += '<div class="price">₹' + v.price.toLocaleString() + '</div>';
                 html += '<button class="buy-btn" onclick="addToCart(' + v.id + ')">Add to Cart</button>';
-                html += '<button class="remove-btn" onclick="removeVehicle(' + v.id + ')">Remove</button>';
+               
                 html += '</div></div>';
             }
             inventoryDiv.innerHTML = html;
